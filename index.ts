@@ -13,12 +13,32 @@ async function handler(_req: Request): Promise<Response> {
     handlePreFlightRequest();
   }
 
+  // Extract words from URL query parameters
+  const url = new URL(_req.url);
+  const word = url.searchParams.get("word");
+
+  if (!word) {
+    return new Response(
+      JSON.stringify({
+        error: "Word query parameters is required",
+      }),
+      {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "content-type",
+        },
+      }
+    );
+  }
+
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
 
   const similarityRequestBody = JSON.stringify({
     word1: "centrale",
-    word2: "supelec",
+    word2: word,
   });
 
   const requestOptions = {
@@ -48,7 +68,6 @@ async function handler(_req: Request): Promise<Response> {
 
     const result = await response.json();
 
-    console.log(result);
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: {
