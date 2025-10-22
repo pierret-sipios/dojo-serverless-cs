@@ -16,10 +16,9 @@ async function handler(_req: Request): Promise<Response> {
   const url = new URL(_req.url);
   const word = url.searchParams.get("word");
 
-  if (word) {
+  if (!word) {
     return new Response(
       JSON.stringify({
-        message: word,
         error: "Word query parameters is required",
       }),
       {
@@ -41,8 +40,6 @@ async function handler(_req: Request): Promise<Response> {
     word2: "chien",
   });
 
-  console.log(`Comparing user word "${word}" with target word "chien"`);
-
   const requestOptions = {
     method: "POST",
     headers: headers,
@@ -55,8 +52,6 @@ async function handler(_req: Request): Promise<Response> {
       "https://word2vec.nicolasfley.fr/similarity",
       requestOptions
     );
-
-    console.log(response);
 
     if (!response.ok) {
       console.error(`Error: ${response.statusText}`);
@@ -71,7 +66,6 @@ async function handler(_req: Request): Promise<Response> {
     }
 
     const result = await response.json();
-    console.log("API result:", result);
 
     return new Response(JSON.stringify(result), {
       status: 200,
